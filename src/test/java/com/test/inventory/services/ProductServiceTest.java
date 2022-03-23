@@ -1,35 +1,28 @@
 package com.test.inventory.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.inventory.dtos.ProductBasicInformation;
 import com.test.inventory.entities.Product;
 import com.test.inventory.repositories.ProductRepository;
+import com.test.inventory.services.implementation.ProductServiceImpl;
 import com.test.inventory.utils.mappers.ProductMapper;
 import com.test.inventory.utils.mappers.ProductMapperImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {ProductService.class, ProductMapper.class, ProductMapperImpl.class})
+@SpringBootTest(classes = {ProductServiceImpl.class, ProductMapper.class, ProductMapperImpl.class})
 public class ProductServiceTest {
     @MockBean
     private  ProductRepository productRepository;
@@ -62,4 +55,30 @@ public class ProductServiceTest {
                         .build());
         Assertions.assertArrayEquals(expectedProducts.toArray(), productsDto.toArray());
     }
+
+
+    @Test
+    public void updateStockSuccess(){
+        Mockito.when(productRepository.getByCode(Mockito.anyString())).thenReturn(
+                mockProduct());
+        Mockito.when(productRepository.save(Mockito.any())).thenReturn(new Product());
+        Assertions.assertTrue(productService.updateStock("someCode", 10));
+    }
+
+    @Test
+    public void updateStockNonProduct(){
+        Mockito.when(productRepository.getByCode(Mockito.anyString())).thenReturn(null);
+        Assertions.assertFalse(productService.updateStock("someCode", 10));
+    }
+
+    private Product mockProduct(){
+        return Product.builder()
+                .id(1)
+                .code("code")
+                .name("Product")
+                .stock(10)
+                .price(12.4)
+                .build();
+    }
+
 }

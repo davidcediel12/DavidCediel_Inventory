@@ -5,6 +5,7 @@ import com.test.inventory.dtos.ProductBasicInformation;
 import com.test.inventory.dtos.exception.ApplicationException;
 import com.test.inventory.dtos.exception.ErrorDetails;
 import com.test.inventory.services.ProductService;
+import com.test.inventory.services.implementation.ProductServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceImpl productService) {
         this.productService = productService;
     }
 
