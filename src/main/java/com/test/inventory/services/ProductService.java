@@ -26,4 +26,8 @@ public class ProductService {
         return productMapper.toListBasicInformation(productRepository.findAll());
     }
 
+    public String updateStock(String productCode, Integer stock){
+        return null;
+    }
+
 }

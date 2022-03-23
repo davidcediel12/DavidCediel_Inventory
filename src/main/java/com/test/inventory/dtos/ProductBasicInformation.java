@@ -7,6 +7,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class ProductBasicInformation {
     private String code;
     private String name;
