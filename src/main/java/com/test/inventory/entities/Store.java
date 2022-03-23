@@ -1,7 +1,6 @@
 package com.test.inventory.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,6 +11,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "STORES")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Store {
     @Id
     @GeneratedValue
@@ -24,7 +26,9 @@ public class Store {
     private String name;
 
     @ManyToMany
-    /*@JoinTable(name = "Store_Product")/*, joinColumns = @JoinColumn(name = "id"),
-        inverseJoinColumns = @JoinColumn(name = "id"))*/
     private Set<Product> products;
+
+    public void addProduct(Product product){
+        products.add(product);
+    }
 }

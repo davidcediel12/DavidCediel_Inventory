@@ -1,6 +1,7 @@
 package com.test.inventory.services;
 
 import com.test.inventory.dtos.ProductBasicInformation;
+import com.test.inventory.entities.Product;
 import com.test.inventory.repositories.ProductRepository;
 import com.test.inventory.utils.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,15 @@ public class ProductService {
         return productMapper.toListBasicInformation(productRepository.findAll());
     }
 
-    public String updateStock(String productCode, Integer stock){
-        return null;
+    public boolean updateStock(String productCode, Integer stock){
+        Product product = productRepository.getByCode(productCode);
+        System.out.println(product);
+        if(product == null)
+            return false;
+        product.setStock(stock);
+        productRepository.save(product);
+        return true;
+
     }
 
 }

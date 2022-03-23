@@ -39,7 +39,10 @@ public class ProductController {
                             .build())
                     .build();
 
-        return ResponseEntity.ok(productService.updateStock(code, stock));
+        boolean updated = productService.updateStock(code, stock);
+        if(!updated)
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/test")
