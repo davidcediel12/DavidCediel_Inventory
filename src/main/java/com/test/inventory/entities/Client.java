@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,6 +23,9 @@ public class Client {
 
     private String name;
     private String lastname;
+
+    @OneToMany(mappedBy = "client")
+    private Set<OrderResume> orders;
 
     @Lob
     @Column(name = "photo")

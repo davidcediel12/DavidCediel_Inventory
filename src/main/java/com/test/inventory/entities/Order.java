@@ -15,13 +15,11 @@ public class Order {
     @GeneratedValue
     private Integer id;
 
+    @ManyToOne
+    private OrderResume orderResume;
+
     @ManyToOne(optional = false)
     private Store store;
-
-    @ManyToOne(optional = false)
-    private Client client;
-
-    private LocalDateTime dateTime;
 
     @ManyToOne(optional = false)
     private Product product;

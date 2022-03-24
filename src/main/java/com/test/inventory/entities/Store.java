@@ -17,7 +17,7 @@ import java.util.Set;
 public class Store {
     @Id
     @GeneratedValue
-    private Integer store;
+    private Integer id;
     @NotNull
     @Column(unique = true, nullable = false)
     private String code;
