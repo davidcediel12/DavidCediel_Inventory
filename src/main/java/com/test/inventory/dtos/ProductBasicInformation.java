@@ -12,4 +12,5 @@ import lombok.*;
 public class ProductBasicInformation {
     private String code;
     private String name;
+    private Integer stock;
 }

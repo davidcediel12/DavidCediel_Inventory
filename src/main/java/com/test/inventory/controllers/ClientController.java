@@ -4,6 +4,7 @@ import com.test.inventory.dtos.ClientDto;
 import com.test.inventory.dtos.exception.ApplicationException;
 import com.test.inventory.dtos.exception.ErrorDetails;
 import com.test.inventory.services.ClientService;
+import com.test.inventory.utils.controllererrors.ControllerErrors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,20 +48,10 @@ public class ClientController {
     @PostMapping("/clients")
     public ResponseEntity createClient(@Valid @RequestBody ClientDto clientDto,
                                        BindingResult result) {
-        System.out.println("Errors" + result.hasErrors());
         if(result.hasErrors()){
-            ErrorDetails errorDetails = ErrorDetails.builder()
-                    .message("Wrong parameters in the request body")
-                    .description("")
-                    .build();
-            for(FieldError e : result.getFieldErrors())
-                errorDetails.setDescription(errorDetails.getDescription() +
-                        "Field: " +  e.getField() + " " + e.getDefaultMessage() +
-                        System.lineSeparator());
-
             throw  ApplicationException.builder()
                     .status(HttpStatus.BAD_REQUEST)
-                    .errorDetails(errorDetails)
+                    .errorDetails(ControllerErrors.resultErrorsToErrorDetails(result))
                     .build();
         }
         if(!clientService.createClient(clientDto))
