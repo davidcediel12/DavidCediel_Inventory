@@ -1,5 +1,6 @@
 package com.test.inventory.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,6 +26,7 @@ public class Store {
     @Size(min = 3)
     private String name;
 
+    @JsonIgnore
     @ManyToMany
     private Set<Product> products;
 

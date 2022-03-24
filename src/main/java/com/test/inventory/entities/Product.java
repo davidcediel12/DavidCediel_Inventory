@@ -34,7 +34,7 @@ public class Product {
 
     private Integer stock;
 
-
+    @JsonIgnore
     @ManyToMany(mappedBy = "products")
     private Set<Store> stores;
 }

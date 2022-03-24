@@ -1,5 +1,6 @@
 package com.test.inventory.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Order {
     @GeneratedValue
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne
     private OrderResume orderResume;
 

@@ -12,7 +12,6 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
                 chooseOrderCreation(store, productOrder, orderResume);
             }
         }
-        orderResumeRepository.save(orderResume);
+
         return true;
     }
 
@@ -124,6 +123,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         productRepository.save(product);
         orderResume.addOrder(order);
+        orderResumeRepository.save(orderResume);
     }
 
 
