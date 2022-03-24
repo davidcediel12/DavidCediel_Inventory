@@ -1,10 +1,16 @@
 package com.test.inventory.entities;
 
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "CLIENTS")
 public class Client {
     @Id

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.inventory.dtos.ProductsDto;
 import com.test.inventory.dtos.exception.ApplicationException;
 import com.test.inventory.dtos.exception.ErrorDetails;
+import com.test.inventory.entities.Client;
 import com.test.inventory.entities.Product;
 import com.test.inventory.entities.Store;
+import com.test.inventory.repositories.ClientRepository;
 import com.test.inventory.repositories.ProductRepository;
 import com.test.inventory.repositories.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,15 +38,19 @@ public class InitializationService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
+    private final ClientRepository clientRepository;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient okHttpClient = new OkHttpClient();
 
 
     @Autowired
     public InitializationService(ProductRepository productRepository,
-                                 StoreRepository storeRepository) {
+                                 StoreRepository storeRepository,
+                                 ClientRepository clientRepository) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
+        this.clientRepository = clientRepository;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -61,8 +69,43 @@ public class InitializationService {
                     .build();
         }
         this.createStores(products);
+        this.createClients();
     }
 
+    private void createClients(){
+
+        File fileImageClient = new File("src/main/resources/ClientProfileImages/client1.jpg");
+        byte[] fileContent = new byte[]{};
+        try {
+            fileContent = Files.readAllBytes(fileImageClient.toPath());
+        } catch (IOException e) {
+            log.error("Error obtaining the image for the first client");
+            e.printStackTrace();
+        }
+
+        clientRepository.save(Client.builder()
+                        .identification("1280191")
+                        .name("Pedro")
+                        .lastname("Perez")
+                        .imageData(fileContent)
+                .build());
+
+
+        fileImageClient = new File("src/main/resources/ClientProfileImages/client2.jpg");
+        try {
+            fileContent = Files.readAllBytes(fileImageClient.toPath());
+        } catch (IOException e) {
+            log.error("Error obtaining the image for the second client");
+            e.printStackTrace();
+        }
+
+        clientRepository.save(Client.builder()
+                .identification("87387286")
+                .name("David")
+                .lastname("Cediel")
+                .imageData(fileContent)
+                .build());
+    }
     private void createStores(List<Product> products){
         storeRepository.save(Store.builder()
                 .code("amz")

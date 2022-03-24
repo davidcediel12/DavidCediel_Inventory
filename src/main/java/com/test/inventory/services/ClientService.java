@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface ClientService {
     List<ClientDto> getAllClients();
-    ClientDto findByIdentification();
-    ClientDto updateClient(String identification);
+    ClientDto findByIdentification(String identification);
+    boolean updateClient(String identification, ClientDto clientDto);
     boolean deleteClientByIdentification(String identification);
-    ClientDto createClient(ClientDto client);
+    boolean createClient(ClientDto client);
 }
