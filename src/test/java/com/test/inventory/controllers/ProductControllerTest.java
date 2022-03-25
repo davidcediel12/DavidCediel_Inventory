@@ -34,6 +34,7 @@ public class ProductControllerTest {
                 ProductBasicInformation.builder()
                         .code("mock-code")
                         .name("mock-name")
+                        .stock(10)
                         .build()));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -41,7 +42,7 @@ public class ProductControllerTest {
                 .accept(MediaType.APPLICATION_JSON);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{code: mock-code, name:mock-name}]", true));
+                .andExpect(content().json("[{code: mock-code, name:mock-name, stock:10}]", true));
     }
 
     @Test

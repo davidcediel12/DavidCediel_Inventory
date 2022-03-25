@@ -52,6 +52,7 @@ public class ProductServiceTest {
                 ProductBasicInformation.builder()
                         .code("prod-code")
                         .name("prod-name")
+                        .stock(18)
                         .build());
         Assertions.assertArrayEquals(expectedProducts.toArray(), productsDto.toArray());
     }
