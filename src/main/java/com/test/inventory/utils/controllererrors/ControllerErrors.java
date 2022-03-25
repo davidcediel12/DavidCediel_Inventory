@@ -1,8 +1,6 @@
 package com.test.inventory.utils.controllererrors;
 
-import com.test.inventory.dtos.exception.ApplicationException;
 import com.test.inventory.dtos.exception.ErrorDetails;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 

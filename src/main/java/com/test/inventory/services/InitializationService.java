@@ -1,7 +1,6 @@
 package com.test.inventory.services;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.inventory.dtos.ProductsDto;
 import com.test.inventory.dtos.exception.ApplicationException;
@@ -22,7 +21,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 
 import java.io.File;
 import java.io.IOException;

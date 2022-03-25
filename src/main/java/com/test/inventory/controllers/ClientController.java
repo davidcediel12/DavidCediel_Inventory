@@ -2,20 +2,15 @@ package com.test.inventory.controllers;
 
 import com.test.inventory.dtos.ClientDto;
 import com.test.inventory.dtos.exception.ApplicationException;
-import com.test.inventory.dtos.exception.ErrorDetails;
 import com.test.inventory.services.ClientService;
 import com.test.inventory.utils.controllererrors.ControllerErrors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
