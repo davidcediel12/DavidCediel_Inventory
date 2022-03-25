@@ -1,12 +1,15 @@
 package com.test.inventory.repositories;
 
+import com.test.inventory.dtos.ClientOrderDetails;
 import com.test.inventory.dtos.OrdersByDateAndStore;
 import com.test.inventory.dtos.SoldProducts;
 import com.test.inventory.entities.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.persistence.Tuple;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -25,4 +28,16 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             "inner join products p on o.product_id = p.id " +
             "group by s.code, p.code", nativeQuery = true)
     List<Tuple> obtainNumberOfSoldProductsByStore();
+
+
+    @Query("select new com.test.inventory.dtos.ClientOrderDetails(" +
+            "o.orderResume.dateTime as transactionTimestamp, " +
+            "o.store.code as storeCode, o.product.code as productCode, " +
+            "o.items as numberOfItems, o.totalPrice as totalPrice) from Order o " +
+            "where o.orderResume.dateTime between :startDate and :endDate and " +
+            "o.orderResume.client.identification = :clientIdentification")
+    List<ClientOrderDetails> clientOrdersBetweenDates(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("clientIdentification") String clientIdentification);
 }

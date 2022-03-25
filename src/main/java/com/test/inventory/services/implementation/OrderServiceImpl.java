@@ -8,24 +8,32 @@ import com.test.inventory.dtos.exception.ErrorDetails;
 import com.test.inventory.entities.*;
 import com.test.inventory.repositories.*;
 import com.test.inventory.services.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Tuple;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderResumeRepository orderResumeRepository;
@@ -229,5 +237,63 @@ public class OrderServiceImpl implements OrderService {
         return soldProducts;
     }
 
+    @Override
+    public InputStreamResource obtainOrdersClientBetweenDates(
+            LocalDate startDate, LocalDate endDate, String clientIdentification)  {
+        List<ClientOrderDetails> clientOrdersDetails = orderRepository.clientOrdersBetweenDates(
+                LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX),
+                clientIdentification);
+
+        ByteArrayInputStream in;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        CSVPrinter csvPrinter = null;
+        try {
+            csvPrinter = new CSVPrinter(new PrintWriter(out),
+                    CSVFormat.DEFAULT);
+            csvPrinter.printRecord(Arrays.asList(
+                    "date", "storecode", "productcode", "items", "totalprice"));
+        } catch (IOException e) {
+            errorCreatingCsv(e.getMessage());
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        for(ClientOrderDetails clientOrderDetails : clientOrdersDetails){
+            List<String> data = Arrays.asList(
+                    clientOrderDetails.getTransactionTimestamp().format(formatter),
+                    clientOrderDetails.getStoreCode(),
+                    clientOrderDetails.getProductCode(),
+                    clientOrderDetails.getNumberOfItems().toString(),
+                    clientOrderDetails.getTotalPrice().toString()
+            );
+            try {
+                csvPrinter.printRecord(data);
+            } catch (IOException e) {
+                errorCreatingCsv(e.getMessage());
+            }
+
+        }
+        try {
+            csvPrinter.flush();
+        } catch (IOException e) {
+            errorCreatingCsv(e.getMessage());
+        }
+
+        in = new ByteArrayInputStream(out.toByteArray());
+        InputStreamResource fileInputStream = new InputStreamResource(in);
+        return fileInputStream;
+    }
+
+
+    private void errorCreatingCsv(String errorMessage){
+        log.error("Error creating the CSV for client transactions");
+        throw ApplicationException.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .errorDetails(ErrorDetails.builder()
+                        .message("Error creating the CSV printer")
+                        .description(errorMessage)
+                        .build())
+                .build();
+    }
 
 }

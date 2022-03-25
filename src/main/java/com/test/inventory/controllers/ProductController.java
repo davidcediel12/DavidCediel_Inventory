@@ -4,21 +4,26 @@ package com.test.inventory.controllers;
 import com.test.inventory.dtos.ProductBasicInformation;
 import com.test.inventory.dtos.exception.ApplicationException;
 import com.test.inventory.dtos.exception.ErrorDetails;
+import com.test.inventory.entities.Client;
 import com.test.inventory.entities.Order;
 import com.test.inventory.entities.OrderResume;
 import com.test.inventory.services.ProductService;
 import com.test.inventory.services.implementation.ProductServiceImpl;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -58,18 +63,59 @@ public class ProductController {
 
 
     @GetMapping(value = "/test")
-    public ResponseEntity<OrderResume> throwException(){
-        OrderResume orderResume = new OrderResume();
-        addItem(orderResume);
-        return ResponseEntity.ok(orderResume);
-    }
+    public ResponseEntity<Resource> throwException() throws IOException {
+        Client client1 = Client.builder()
+                .identification("1280191")
+                .name("Pedro")
+                .lastname("Perez")
+                .build();
 
-    private void addItem(OrderResume orderResume){
-        addItem2(orderResume);
-    }
 
-    private void addItem2(OrderResume orderResume){
-        orderResume.addOrder(Order.builder().totalPrice(222d).build());
+        Client client2 = Client.builder()
+                .identification("87387286")
+                .name("David")
+                .lastname("Cediel")
+                .build();
+
+        List<Client> csvBody = new ArrayList<>();
+        csvBody.add(client1);
+        csvBody.add(client2);
+
+        ByteArrayInputStream in;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out),
+                CSVFormat.DEFAULT);
+
+        csvPrinter.printRecord(Arrays.asList("Identification", "Name", "LastName"));
+        for(Client c : csvBody){
+            List<String> data = Arrays.asList(
+                    c.getIdentification(),
+                    c.getName(),
+                    c.getLastname()
+            );
+            csvPrinter.printRecord(data);
+
+        }
+
+
+        csvPrinter.flush();
+
+        in = new ByteArrayInputStream(out.toByteArray());
+        InputStreamResource fileInputStream = new InputStreamResource(in);
+        String csvFileName = "people.csv";
+
+        // setting HTTP headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + csvFileName);
+        // defining the custom Content-Type
+        headers.set(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+        return new ResponseEntity<>(
+                fileInputStream,
+                headers,
+                HttpStatus.OK
+        );
     }
 
 
