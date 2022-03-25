@@ -2,6 +2,7 @@ package com.test.inventory.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class OrderResume {
     @OneToMany(mappedBy = "orderResume")
     private Set<Order> orders;
 
+    @CreationTimestamp
     private LocalDateTime dateTime;
 
     public void addOrder(Order order){

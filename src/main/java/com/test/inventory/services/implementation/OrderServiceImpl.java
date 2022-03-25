@@ -16,8 +16,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Tuple;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -55,9 +61,8 @@ public class OrderServiceImpl implements OrderService {
         Client client = clientRepository.findByIdentification(bigOrderDto.getClientIdentification()).get();
         OrderResume orderResume = OrderResume.builder()
                 .client(client)
-                .dateTime(LocalDateTime.now())
                 .build();
-
+        orderResumeRepository.save(orderResume);
         for(StoreOrder storeOrder : bigOrderDto.getStoreOrders()){
             Store store = storeRepository.findByCode(storeOrder.getStoreCode()).orElse(null);
             if(store == null)
@@ -77,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Depending on the stock of the product, it choose one way to save the order
+     * Depending on the stock of the product, it chooses one way to save the order
      * @param store
      * @param productOrder
      * @param orderResume
@@ -191,4 +196,38 @@ public class OrderServiceImpl implements OrderService {
                         .build())
                 .build();
     }
+
+
+    @Override
+    public List<OrdersByDateAndStore> obtainNumberOfOrdersByDateAndStore(){
+        List<Tuple> results =  orderRepository.obtainNumberOfOrdersByDateAndStore();
+        List<OrdersByDateAndStore> orders = new ArrayList<>();
+
+        for(Tuple result : results){
+            orders.add(OrdersByDateAndStore.builder()
+                    .orderDate(((Date)result.get("orderDate")).toLocalDate())
+                    .numberOfOrders(((BigInteger)result.get("numberOfOrders")).intValue())
+                    .storeCode(result.get("storeCode").toString())
+                    .build());
+        }
+
+        return orders;
+    }
+
+    @Override
+    public List<SoldProducts> obtainNumberOfSoldProductsByStore() {
+        List<Tuple> results =  orderRepository.obtainNumberOfSoldProductsByStore();
+        List<SoldProducts> soldProducts = new ArrayList<>();
+
+        for(Tuple result : results){
+            soldProducts.add(SoldProducts.builder()
+                    .storeCode(result.get("storeCode").toString())
+                    .productCode(result.get("productCode").toString())
+                    .numberOfSoldProducts(((BigInteger) result.get("numberOfSoldProducts")).intValue())
+                    .build());
+        }
+        return soldProducts;
+    }
+
+
 }
