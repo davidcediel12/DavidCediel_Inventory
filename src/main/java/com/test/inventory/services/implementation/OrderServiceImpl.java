@@ -57,6 +57,14 @@ public class OrderServiceImpl implements OrderService {
         this.productRepository = productRepository;
     }
 
+    /**
+     * Entry point to create the order, it validates the existence of the clients
+     * and store, then, for each product bought in the store, call the method
+     * {@link {#chooseOrderCreation() ChooseOrderCreation} to decide how to make
+     * (or reject) the order of the product depending on the stock and the desired quantity
+     * @param bigOrderDto contains all the information about the order
+     * @return true if the transaction is made, false otherwise
+     */
     @Override
     @Transactional
     public boolean createOrderResume(BigOrderDto bigOrderDto) {
@@ -94,9 +102,10 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * Depending on the stock of the product, it chooses one way to save the order
-     * @param store
-     * @param productOrder
-     * @param orderResume
+     * @param store store where the product was bought
+     * @param productOrder contains information about the order, like number of items and product
+     * @param orderResume is the parent of the product order, if the order is made,
+     *                    then the product is added to orderResume
      */
     private void chooseOrderCreation(Store store, ProductOrder productOrder, OrderResume orderResume){
         Product product = productRepository.findByCode(productOrder.getProductCode()).orElse(null);
@@ -125,7 +134,13 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-
+    /**
+     * Perform all the data transaction to store the order
+     * @param product product to edit the stock
+     * @param productOrder order to save
+     * @param store store where the product was bought
+     * @param orderResume orderResume to add the order
+     */
     private void makeOrder(Product product, ProductOrder productOrder,
                            Store store, OrderResume orderResume){
         product.setStock(product.getStock() - productOrder.getNumberOfItems());
@@ -142,7 +157,12 @@ public class OrderServiceImpl implements OrderService {
         orderResumeRepository.save(orderResume);
     }
 
-
+    /**
+     * Calls a third party api to restock the product, depending on the needed stock
+     * it calls a service
+     * @param product product to restock
+     * @param units number of units to restock
+     */
     private void restockProduct(Product product, RestockUnits units)  {
         String url = "";
         if(units == RestockUnits.TEN)
